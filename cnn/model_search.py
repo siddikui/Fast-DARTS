@@ -6,8 +6,10 @@ from torch.autograd import Variable
 from genotypes import PRIMITIVES
 from genotypes import Genotype
 
-
 class MixedOp(nn.Module):
+  ''' Get all the operations in the search space given number of channels and stride
+  forward method: applies operations on a given input, multiplies with respective weight and sums.  
+  '''
 
   def __init__(self, C, stride):
     super(MixedOp, self).__init__()
@@ -17,12 +19,15 @@ class MixedOp(nn.Module):
       if 'pool' in primitive:
         op = nn.Sequential(op, nn.BatchNorm2d(C, affine=False))
       self._ops.append(op)
+  
+
 
   def forward(self, x, weights):
     return sum(w * op(x) for w, op in zip(weights, self._ops))
 
 
 class Cell(nn.Module):
+
 
   def __init__(self, steps, multiplier, C_prev_prev, C_prev, C, reduction, reduction_prev):
     super(Cell, self).__init__()
@@ -59,6 +64,7 @@ class Cell(nn.Module):
 
 
 class Network(nn.Module):
+
 
   def __init__(self, C, num_classes, layers, criterion, steps=4, multiplier=4, stem_multiplier=3):
     super(Network, self).__init__()
@@ -117,10 +123,11 @@ class Network(nn.Module):
     return self._criterion(logits, target) 
 
   def _initialize_alphas(self):
-    k = sum(1 for i in range(self._steps) for n in range(2+i))
+  	
+    k = sum(1 for i in range(self._steps) for n in range(2+i)) #k =14
     num_ops = len(PRIMITIVES)
 
-    self.alphas_normal = Variable(1e-3*torch.randn(k, num_ops).cuda(), requires_grad=True)
+    self.alphas_normal = Variable(1e-3*torch.randn(k, num_ops).cuda(), requires_grad=True) # num_ops=8
     self.alphas_reduce = Variable(1e-3*torch.randn(k, num_ops).cuda(), requires_grad=True)
     self._arch_parameters = [
       self.alphas_normal,
@@ -134,12 +141,13 @@ class Network(nn.Module):
 
     def _parse(weights):
       gene = []
-      n = 2
+      n = 2 #2
       start = 0
       for i in range(self._steps):
         end = start + n
         W = weights[start:end].copy()
         edges = sorted(range(i + 2), key=lambda x: -max(W[x][k] for k in range(len(W[x])) if k != PRIMITIVES.index('none')))[:2]
+        #print('EDGES : ',edges)
         for j in edges:
           k_best = None
           for k in range(len(W[j])):

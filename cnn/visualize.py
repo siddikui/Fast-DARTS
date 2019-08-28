@@ -3,9 +3,9 @@ import genotypes
 from graphviz import Digraph
 
 
-def plot(genotype, filename):
+def plot(genotype, filename, caption):
   g = Digraph(
-      format='pdf',
+      format='png',
       edge_attr=dict(fontsize='20', fontname="times"),
       node_attr=dict(style='filled', shape='rect', align='center', fontsize='20', height='0.5', width='0.5', penwidth='2', fontname="times"),
       engine='dot')
@@ -35,7 +35,8 @@ def plot(genotype, filename):
   for i in range(steps):
     g.edge(str(i), "c_{k}", fillcolor="gray")
 
-  g.render(filename, view=True)
+  g.attr(label=caption, overlap='false', fontsize='20', fontname='times')
+  g.render(filename, view=False)
 
 
 if __name__ == '__main__':

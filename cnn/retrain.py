@@ -25,18 +25,18 @@ parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
 parser.add_argument('--weight_decay', type=float, default=3e-4, help='weight decay')
 parser.add_argument('--report_freq', type=float, default=50, help='report frequency')
 parser.add_argument('--gpu', type=int, default=0, help='gpu device id')
-parser.add_argument('--epochs', type=int, default=100, help='num of training epochs') #600
-parser.add_argument('--init_channels', type=int, default=16, help='num of init channels') #36
-parser.add_argument('--layers', type=int, default=5, help='total number of layers') #20
+parser.add_argument('--epochs', type=int, default=300, help='num of training epochs') #600
+parser.add_argument('--init_channels', type=int, default=24, help='num of init channels') #36
+parser.add_argument('--layers', type=int, default=10, help='total number of layers') #20
 parser.add_argument('--model_path', type=str, default='saved_models', help='path to save the model')
 parser.add_argument('--auxiliary', action='store_true', default=False, help='use auxiliary tower')
 parser.add_argument('--auxiliary_weight', type=float, default=0.4, help='weight for auxiliary loss')
 parser.add_argument('--cutout', action='store_true', default=False, help='use cutout')
 parser.add_argument('--cutout_length', type=int, default=16, help='cutout length')
 parser.add_argument('--drop_path_prob', type=float, default=0.2, help='drop path probability')
-parser.add_argument('--save', type=str, default='DARTS_V1_Train', help='experiment name')
-parser.add_argument('--seed', type=int, default=10, help='random seed')#0
-parser.add_argument('--arch', type=str, default='DARTS_V1', help='which architecture to use')
+parser.add_argument('--save', type=str, default='EXP', help='experiment name')
+parser.add_argument('--seed', type=int, default=0, help='random seed')#0
+parser.add_argument('--arch', type=str, default='C12L5E18', help='which architecture to use')
 parser.add_argument('--grad_clip', type=float, default=5, help='gradient clipping')
 args = parser.parse_args()
 
@@ -121,9 +121,7 @@ def train(train_queue, model, criterion, optimizer):
   model.train()
 
   for step, (input, target) in enumerate(train_queue):
-    #input = Variable(input).cuda()
-    #target = Variable(target).cuda(async=True)
-
+    
     input = input.cuda(non_blocking=True)
     target = target.cuda(non_blocking=True)
 

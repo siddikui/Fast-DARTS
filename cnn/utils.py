@@ -111,6 +111,9 @@ def drop_path(x, drop_prob):
 def create_exp_dir(path, scripts_to_save=None):
   if not os.path.exists(path):
     os.mkdir(path)
+    os.mkdir(os.path.join(path, 'plots'))
+    #os.mkdir(os.path.join(path, 'gifs'))
+
   print('Experiment dir : {}'.format(path))
 
   if scripts_to_save is not None:

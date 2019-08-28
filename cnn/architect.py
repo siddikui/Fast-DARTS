@@ -75,16 +75,19 @@ class Architect(object):
 
   def _hessian_vector_product(self, vector, input, target, r=1e-2):
     R = r / _concat(vector).norm()
+    # w+ = w + ---
     for p, v in zip(self.model.parameters(), vector):
       p.data.add_(R, v)
+    # Gradient training loss with w+ wrt alphas.
     loss = self.model._loss(input, target)
     grads_p = torch.autograd.grad(loss, self.model.arch_parameters())
-
+    # w- = w - ---
     for p, v in zip(self.model.parameters(), vector):
       p.data.sub_(2*R, v)
+    # Gradient training loss with w- wrt alphas.  
     loss = self.model._loss(input, target)
     grads_n = torch.autograd.grad(loss, self.model.arch_parameters())
-
+    # Take model.parameters() to what they were.
     for p, v in zip(self.model.parameters(), vector):
       p.data.add_(R, v)
 
